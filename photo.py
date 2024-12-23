@@ -5,6 +5,7 @@ import pathlib
 import requests
 from tqdm import tqdm
 import warnings
+import time
 
 
 class Photo:
@@ -15,6 +16,7 @@ class Photo:
     year: int
 
     __ALT_SIZES = ("o", "n", "w", "z", "c", "b", "h", "k", "t", "q", "s", "3k", "4k", "f", "5k", "6k")
+    __WAIT_TIME = 1
 
 
     def __init__(self, photo_dict: dict):
@@ -83,6 +85,7 @@ class Photo:
                 try:
                     p.download(image_dir)
                     rows.append(p.as_dict())
+                    time.sleep(Photo.__WAIT_TIME)
                     progress_bar.update(1)
                 except requests.HTTPError as e:
                     if e.response.status_code == 403 or e.response.status_code == 429:
