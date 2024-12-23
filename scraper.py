@@ -36,8 +36,7 @@ class Scraper:
     def fetch_images_for_year(self, year: int, page=1, per_page=250) -> list[Photo]:
         query = self.__query_builder(year, page=page, per_page=per_page)
         r = requests.get(query)
-        if r.status_code != 200:
-            raise ValueError(f"Something went wrong while fetching images for {year}. Status code: {r.status_code}")
+        r.raise_for_status()
 
         photos = r.json()["photos"]["photo"]
         return [Photo(p) for p in photos]

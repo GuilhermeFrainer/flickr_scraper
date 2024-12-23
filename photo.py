@@ -58,8 +58,9 @@ class Photo:
             return
 
         r = requests.get(self.url)
-        if r.status_code != 200:
-            raise ValueError(f"Request error. Status code: {r.status_code}")
+        r.raise_for_status()
+        #if r.status_code != 200:
+        #    raise ValueError(f"Request error. Status code: {r.status_code}. Response: {r.content}")
         
         with open(full_path, "wb") as f:
             f.write(r.content)
