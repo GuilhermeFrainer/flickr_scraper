@@ -4,6 +4,7 @@ import polars as pl
 import pathlib
 import requests
 from tqdm import tqdm
+import warnings
 
 
 class Photo:
@@ -52,6 +53,13 @@ class Photo:
 
 
     def download(self, image_dir: pathlib.Path):
+        """
+        Downloads photo.
+        Raises HTTPError if status code isn't 200.
+
+        Args:
+            image_dir (pathlib.Path): path to the directory to save image to.
+        """
         filename = str(self.id) + ".jpg"
         full_path = image_dir / filename
         if full_path.is_file():
@@ -59,8 +67,6 @@ class Photo:
 
         r = requests.get(self.url)
         r.raise_for_status()
-        #if r.status_code != 200:
-        #    raise ValueError(f"Request error. Status code: {r.status_code}. Response: {r.content}")
         
         with open(full_path, "wb") as f:
             f.write(r.content)
@@ -71,11 +77,21 @@ class Photo:
         image_dir.mkdir(parents=True, exist_ok=True)
         
         rows = []
+        skipped_images = 0
         with tqdm(total=len(photos), desc="Downloading Images", unit="image") as progress_bar:
             for p in photos:
-                p.download(image_dir)
-                rows.append(p.as_dict())
-                progress_bar.update(1)
+                try:
+                    p.download(image_dir)
+                    rows.append(p.as_dict())
+                    progress_bar.update(1)
+                except requests.HTTPError as e:
+                    if e.response.status_code == 403:
+                        skipped_images += 1
+                        continue
+                    else:
+                        raise e
+        if skipped_images > 0:
+            warnings.warn(f"Total images skipped: {skipped_images}")
         df = pl.DataFrame(rows)
         df.write_csv(metadata_path)
 
