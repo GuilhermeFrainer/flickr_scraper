@@ -52,12 +52,16 @@ class Photo:
 
 
     def download(self, image_dir: pathlib.Path):
+        filename = str(self.id) + ".jpg"
+        full_path = image_dir / filename
+        if full_path.is_file():
+            return
+
         r = requests.get(self.url)
         if r.status_code != 200:
             raise ValueError(f"Request error. Status code: {r.status_code}")
         
-        filename = str(self.id) + ".jpg"
-        with open(image_dir / filename, "wb") as f:
+        with open(full_path, "wb") as f:
             f.write(r.content)
 
 

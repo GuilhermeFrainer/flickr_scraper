@@ -9,8 +9,6 @@ class Scraper:
     secret: str
     image_dir: pathlib.Path
 
-    __ALT_SIZES = ("o", "n", "w", "z", "c", "b", "h", "k", "t", "q", "s", "3k", "4k", "f", "5k", "6k")
-
 
     def __init__(self, key: str, secret: str, image_dir="images"):
         self.key = key
