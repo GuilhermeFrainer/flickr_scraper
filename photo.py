@@ -85,7 +85,7 @@ class Photo:
                     rows.append(p.as_dict())
                     progress_bar.update(1)
                 except requests.HTTPError as e:
-                    if e.response.status_code == 403:
+                    if e.response.status_code == 403 or e.response.status_code == 429:
                         skipped_images += 1
                         continue
                     else:
