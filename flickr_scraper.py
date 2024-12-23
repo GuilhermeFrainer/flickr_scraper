@@ -15,7 +15,6 @@ def main():
     parser.add_argument("-n", type=int, default=1000, help="Total number of images to scrape")
 
     args = parser.parse_args()
-    print(args.n)
 
     scraper = Scraper(api_key, api_secret)
     if isinstance(args.year, int):

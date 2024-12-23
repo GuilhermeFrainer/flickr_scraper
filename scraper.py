@@ -50,11 +50,10 @@ class Scraper:
         max_date = f"{year}-12-31"
         query = f"https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key={self.key}"
         query += f"&min_taken_date={min_date}&max_taken_date={max_date}"
-        query += f"&has_geo="
-        query += "&extras=date_taken%2Cgeo%2Curl_m"
-        alt_sizes = ("%2Curl_" + a for a in Scraper.__ALT_SIZES)
-        for a in alt_sizes:
-            query += a
+        query += f"&has_geo=1"
+        query += "&extras=date_taken%2Cgeo%2Curl_m%2Curl_o%2Curl_n%2Curl_w%2Curl_z%2Curl_c%2Curl_b"
+        query += "%2Curl_h%2Curl_k%2Curl_t%2Curl_q%2Curl_s%2Curl_3k%2Curl_4k"
+        query += "%2Curl_f%2Curl_5k%2Curl_6k"
         query += f"&per_page={per_page}"
         query += f"&page={page}&format=json&nojsoncallback=1"
         return query
