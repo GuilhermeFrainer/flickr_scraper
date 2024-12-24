@@ -30,6 +30,7 @@ class Scraper:
         
         year_dir = self.image_dir / str(year)
         images = images[:total] # Take excess off
+        print(f"Fetched images: {len(images)}")
         Photo.download_photos(images, image_dir=year_dir, metadata_path=year_dir / "metadata.csv")
 
 

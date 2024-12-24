@@ -54,24 +54,28 @@ class Photo:
         }
 
 
-    def download(self, image_dir: pathlib.Path):
+    def download(self, image_dir: pathlib.Path) -> bool:
         """
         Downloads photo.
         Raises HTTPError if status code isn't 200.
 
         Args:
             image_dir (pathlib.Path): path to the directory to save image to.
+
+        Returns:
+            bool: true if image was downloaded, false otherwise (i.e. if it was already present)
         """
         filename = str(self.id) + ".jpg"
         full_path = image_dir / filename
         if full_path.is_file():
-            return
+            return False
 
         r = requests.get(self.url)
         r.raise_for_status()
         
         with open(full_path, "wb") as f:
             f.write(r.content)
+        return True
 
 
     @staticmethod
@@ -83,9 +87,10 @@ class Photo:
         with tqdm(total=len(photos), desc="Downloading Images", unit="image") as progress_bar:
             for p in photos:
                 try:
-                    p.download(image_dir)
+                    downloaded = p.download(image_dir)
                     rows.append(p.as_dict())
-                    time.sleep(Photo.__WAIT_TIME)
+                    if downloaded:
+                        time.sleep(Photo.__WAIT_TIME)
                     progress_bar.update(1)
                 except requests.HTTPError as e:
                     if e.response.status_code == 403 or e.response.status_code == 429:
@@ -95,6 +100,6 @@ class Photo:
                         raise e
         if skipped_images > 0:
             warnings.warn(f"Total images skipped: {skipped_images}")
-        df = pl.DataFrame(rows)
+        df = pl.DataFrame(rows).unique(["id", "latitude", "longitude"])
         df.write_csv(metadata_path)
 
