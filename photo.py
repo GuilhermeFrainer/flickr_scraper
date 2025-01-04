@@ -98,6 +98,9 @@ class Photo:
                         continue
                     else:
                         raise e
+                except requests.ConnectionError as e:
+                    continue
+
         if skipped_images > 0:
             warnings.warn(f"Total images skipped: {skipped_images}")
         df = pl.DataFrame(rows).unique(["id", "latitude", "longitude"])
